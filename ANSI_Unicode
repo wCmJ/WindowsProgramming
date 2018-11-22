@@ -26,7 +26,7 @@ Unicode: the wide-byte character set
     wcs: wide character string
     use Tchar.h instead of String.h
     
-
+    TCHAR/_TEXT will be different as the _UNICODE is defined
 
 
 
