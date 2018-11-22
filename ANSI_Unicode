@@ -1,0 +1,38 @@
+strlen: it returns the number of characters in a zero-terminated array of single-byte characters.
+
+double-byte character sets(DBCSs) were created to support these languages and writing systems.
+in a double-byte character set, each character in a string consists of either 1 or 2 bytes.
+the ANSI c run-time library has no functions that allow you to manipulate double-byte character sets.
+the microsoft Visual C++ run-time library does include a number of functions, such as _mbslen, that allow you to manipulate multibyte character strings.
+For example:
+    PTSTR CharNext(PCTSTR pszCurrentChar)
+    PTSTR CharPrev(PCTSTR pszStart, PCTSTR pszCurrentChar);
+    BOOL IsSBCSLeadByte(BYTE bTestChar);
+    
+Unicode: the wide-byte character set
+    all characters in a Unicode string are 16-bit values(2 bytes).
+    no need to call functions such as CharNext, CharPrev...
+    typedef unsigned short wchar_t;
+    char* strcat(char*, const char*);
+    wchar_t* wcscat(wchar_t*, const wchar_t*);
+    char* strchr(const char*, int);
+    wchar_t* wcschr(const wchar_t*, wchar_t);
+    int strcmp(const char*, const char*);
+    int wcscmp(const wchar_t*, const wchar_t*);
+    char* strcpy(char*, const char*);
+    wchar_t* wcscpy(wchar_t*, const wchar_t*);
+    size_t strlen(const char*);
+    size_t wcslen(const wchar_t*);
+    wcs: wide character string
+    use Tchar.h instead of String.h
+    
+
+
+
+
+
+
+
+
+
+
