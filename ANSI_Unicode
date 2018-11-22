@@ -27,7 +27,26 @@ Unicode: the wide-byte character set
     use Tchar.h instead of String.h
     
     TCHAR/_TEXT will be different as the _UNICODE is defined
+    WCHAR: Unicode character
+    PWSTR: Pointer to a Unicode string
+    PCWSTR: Pointer to a constant Unicode string
+    
+    the _UNICODE macro is used for the C run-time header files.
+    the UNICODE macro is used for the windows header files.
+    
+if you are creating dynamic-link libraries(DLLs) that other software developers will use, consider using this technique:
+supply two exported functions in the DLL-an ANSI version and a Unicode version.
+in the ANSI version, simply allocate memory, perform the necessary string conversions, and call the Unicode version of the function.
 
+the big problem with the old functions is that they don't accept Unicode strings.
+when you call these functions, you must pass ANSI strings.
+    
+char szA[100];
+WCHAR szW[100];
+sprintf(szA, "%s", "ANSI Str");
+sprintf(szA, "%S", L"Unicode Str");
+swprintf(szW, L"%s", L"Unicode Str");
+swprintf(szW, L"%S", "ANSI Str");
 
 
 
