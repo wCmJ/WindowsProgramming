@@ -1,5 +1,19 @@
+the system creates and manipulates several types of kernel objects, such as access token objects, event objects, file objects, file-mapping objects, I/O completion port objects, job objects, mailslot objects, mutex objects, pipe objects, process objects, semaphore objects, thread objects, and waitable timer objects.
+each kernel object is simply a memory block allocated by the kernel and is accessible only by the kernel.
 
+when create a kernel object, the function returns a handle that identifies the object.
+the handle can be used by any thread in your process.
 
+handle values are process-relative.
+
+kernel objects are owned by the kernel, not by a process.
+if the process that create the kernel object terminates, the kernel object is not necessarily destroyed.
+
+kernel objects      security descriptor
+security descriptors are usually used when writing server applications, you can ignore this feature of kernel objects if you are writing client-side applications.
+
+process got a handle table when initialized
+a handle table is used only for kernel objects, not for user objects or GDI objects.
 
 
 
