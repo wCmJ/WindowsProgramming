@@ -1,0 +1,36 @@
+two components:
+1.  A kernel object: the operating system uses to manage the process
+2.  An address space: contains all the executable or DLL module's code and data and dynamic memory allocations such as thread stacks and heap allocations.
+
+when a process is created, the system automaticlly creates its first thread, called the primary thread. this thread can then create additional thread, and these can in turn create even more threads.
+each thread has its own set of CPU registers and its own stack.
+
+windows supports two types of applications: GUI and CUI
+GUI: graphical user interface 
+CUI: console user interface, are text-based. e.g. CMD.EXE
+
+/SUBSYSTEM:CONSOLE for CUI applications: main(system: mainCRTStartup)/wmain(system: mainCRTStartup)
+/SUBSYSTEM:WINDOWS for GUI applications: WinMain(system: WinMainCRTStartup)/wWinMain(system: wWinMainCRTStartup)
+
+
+the operating system calls a C/C++ run-time startup function. this function initializes the C/C++ run-time library so that you can call functions such as malloc and free.
+what the startup functions do:
+    1.retrieve a pointer to the new process's full command line.
+    2.retrieve a pointer to the new process's environment variables.
+    3.initialize the C/C++ run time's global variables. your code can access these variables if you include StdLib.h.
+    4.initialize the heap used by the C run-time memory allocation functions and other low-level input/output routines.
+    5.call constructors for all global and static c++ class objects.
+After all of this initialization, the C/C++ startup function calls your application's entry-point function.    
+GetModuleHandle: 
+1.it examines only the calling process's address space, if the calling process does not use any commonm dialog functions,
+calling GetModuleHandle and passing it "ComDlg32" cause NULL to be returned even though ComDlg32.dll is probably loaded into other processes' address spaces.
+2.passing a value of NULL returns the base address of the executable file in the process's address space. so even if you call GetModuleHandle(NULL) from code that is contained inside a DLL,
+the value returned is the executable file's base address-not the DLL file's base address.
+
+
+
+    
+    
+
+
+
