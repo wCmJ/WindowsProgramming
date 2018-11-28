@@ -15,6 +15,47 @@ security descriptors are usually used when writing server applications, you can 
 process got a handle table when initialized
 a handle table is used only for kernel objects, not for user objects or GDI objects.
 
+--------------------------------------------
+Handle Table
+--------------------------------------------
+Index       Pointer to kernel object memory block       Access Mask       Flags
+1           0xF0000000                                  0x????????        0x00000000
+2           0x00000000                                  (N/A)             (N/A)
+3           0xF0000010                                  0x????????        0x00000001
+
+
+
+
+
+--------------------------------------------
+Mechanisms that allow processes to share kernel objects.
+--------------------------------------------
+1.object handle inheritance
+  can be used only when processes have a parent-child relationship.
+  step:
+    1.parent must indicate to the system that it wants the object's handle to be inheritable, kernel objects themselves are not.
+      SECURITY_ATTRIBUTES sa; sa.bInheritHandle = TRUE; sa.nLength = sizeof(sa);  sa.lpSecurityDescriptor = NULL;
+      HANDLE hMutex = CreateMutex(&sa, FALSE, NULL);
+      Flags will be non-zero.
+    2.parent process to spawn the child process
+      CreateProcess(...) set bInheritHandles to true
+      the system walks the parent process's handle table, and for each entry it find that contains a valid inheritable handle,
+      the system copies the entry exactly into the child process's handle table.
+      the entry is copied to the exact same position in the child process's handle table as in the parent's handle table.
+      object handle inheritance applies only at the time the child process is spawned.
+      if the parent process were to create any new kernel objects with inheritable handles, an already-running child process would not inherit these new handles.
+      
+      use command line or environment variable to tell child process what the value of object handle is.
+
+2.Changing a handle's Flags
+  SetHandleInformation()
+
+3.Named objects
+  
+
+
+
+
 
 
 
