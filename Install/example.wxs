@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product    Id="F1A72268-AB39-40A7-9A07-6F61DBC3099A"
+                Name="Json"
+                Language="1033"
+                Version="1.0.0.$(env.REVISION)"
+                Manufacturer="lyou.Per"
+                UpgradeCode="FF14B3A4-EA01-4F4E-BAC2-8A08E87ADD5A"> 
+        <Package    Compressed="yes"
+                    InstallScope="perUser"
+                    InstallPrivileges="limited"
+                    Manufacturer="lyou.Per"
+                    Comments="(p) 2019 lyou, Per."/>
+        <MediaTemplate EmbedCab="yes"/>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="Install_Dir" Name="Json.lyou" />
+        </Directory>
+        <SetDirectory Id="Install_Dir" Value="[LocalAppDataFolder]lyouPer\Json" Sequence="execute" />
+        <DirectoryRef Id="Install_Dir">
+            <Component Id="Exe_File" Guid="FBDC5028-1E23-4DD9-8CCB-ABB043699100">
+                <File   Id="Json_File"
+                        Name="leptjsonTest.exe"
+                        Source="..\inc\build\Debug\leptjson_test.exe"
+                        KeyPath="yes" 
+                />
+            </Component>
+            <Component Id="Lib_File" Guid="39C9C4E8-A664-49ED-B283-0A2728B8B13E">
+                <File   Id="Json_Lib"
+                        Name="leptjson.lib"
+                        Source="..\inc\build\Debug\leptjson.lib"
+                        KeyPath="yes"
+                />        
+            </Component>  
+            <Component Id="Reg_File" Guid="DCF27FF4-9E7D-4465-B6A2-646267D0570D">
+                <RegistryKey Root="HKCR" Key="lyou.Per" ForceDeleteOnUninstall="yes">
+                    <RegistryValue Type="string" Name="URL Protocol" Value=""/>
+                    <RegistryValue Type="string" Value="URL:jsonlyou"/>
+                    <RegistryKey Key="DefaultIcon">
+                        <RegistryValue Type="string" Value=""/>
+                    </RegistryKey>
+                    <RegistryKey Key="shell\open\command">
+                        <RegistryValue Type="string" Value="&quot;[Install_Dir]leptjsonTest.exe&quot; &quot;%1&quot; "/>
+                    </RegistryKey>
+                    <RegistryValue Type="string" Name="revision" Value="$(env.REVISION)" />
+                </RegistryKey>
+            </Component>                      
+        </DirectoryRef>
+
+        <Feature    Id="Feature_Install"
+                    Title="lyou Per"
+                    Level="1">
+            <ComponentRef Id="Exe_File" />
+            <ComponentRef Id="Lib_File" />
+            <ComponentRef Id="Reg_File" />            
+        </Feature>
+        <UI>
+            <UIRef Id="WixUI_Minimal" />
+        </UI>
+
+    </Product>
+</Wix>                                                    
