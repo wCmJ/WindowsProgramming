@@ -51,3 +51,15 @@ int createThread(HANDLE &threadId, FUNC_POINTER cbFunc, void userDefined)
     return 0;
 }
 
+SetThreadPriority(HANDLE, THREAD_PRIORITY_TIME_CRITICAL);
+ResumeThread(HANDLE);//decrements a thread's suspend count, when to zero, resumed.
+
+
+
+
+
+
+
+
+
+
