@@ -1,0 +1,259 @@
+sessionManager
+	sessionList(mediaSession1->mediaSession2->...)
+		mediaSession
+			audio_pipeline_mgr
+				rtcpSession
+				audio_send_pipeline
+					audio_src_chan
+						IDirectSoundCapture8
+						IDirectSoundCatureBuffer8
+						CHAN
+						_echo_cancellation(AEC)
+						_dtmf_encoder
+					rtp_send_chan
+						CHAN
+						_rtp_recv_chan
+						pSendBuf
+						pRTCPSession						
+					audio_encoder
+					data_dump_chan
+				audio_recv_pipeline
+					audio_sink_chan
+					rtp_recv_chan
+					audio_decoder
+					data_dump_chan
+			video_pipeline_mgr
+			fecc_pipeline
+
+CHAN(basic class):
+	mod
+	outputList
+	inputList
+	videoJitterBuffersize
+
+IDirectSoundCapture8: 设备对象，根据录音设备创建的设备对象，利用该对象可以获取设备的属性
+IDirectSoundCaptureBuffer8: 缓冲区对象，该对象有设备对象创建，用来操作音频数据
+IDirectSoundNotify8: 事件通知对象，用来通知应用程序从缓冲区将数据取走，写入文件保存
+
+步骤：
+1.枚举录音设备
+2.根据选择的设备创建对象
+3.利用设备对象创建缓冲区对象
+4.设置通知机制
+5.创建工作线程，用来将缓冲区的数据写入文件
+
+
+HandleAudioStreamRequested
+AudioRecord
+putAudioData
+inputchannel
+AECchannel
+encodechannel
+rtpsendchannel
+
+
+rtprecvchannel
+decodechannel
+flowcontrolchannel
+outputchannel
+getaudiodata
+audiotrack
+
+
+rtp:(bit)
+V-2 P-1 X-1 CC-4  	M-1	PT-7	SEQUENCE-NUMBER-16
+				TIMESTAMP-32
+				SSRC-32
+				CSRC-32
+				...
+
+FLV:(9 bytes)
+FLV-3	VERSION-1	FLAG-1				HEADER-LENGTH-4
+					7|6|5|4|3|2|1|0		0X00000009
+					v 0	a 0 0 0 0 0
+					1	1
+					0	0
+
+H264:视频压缩标准
+I帧，P帧，B帧
+I帧：可通过视频压缩算法解压成一张完整图片
+P帧：只需要参考前面的I帧和P帧
+B帧：需要同时参考前面和后面的I帧和P帧
+一帧视频数据由一个或多个SLICE构成，
+
+
+NAL		+	VCL
+HEADER		AFTER CODEC
+
+H.264DATA = STARTCODE + NALU
+NALU = NALU HEADER + EBSP
+NALU对应一个SLICE数据，即一帧视频数据对应一个或多个NALU
+STARTCODE:如果NALU对应的SLICE为一个帧的开始，对应0X00000001, 否则3字节0x000001
+ebsp
+
+
+//6.26
+#include<mutex>
+using namespace std;
+
+mutex m1;
+mutex m2;
+lock_guard<mutex> lg(m);
+//
+lock(m1,m2);
+lock_guard<mutex> lg2(m1, adopt_lock);
+lock_guard<mutex> lg2(m2, adopt_lock);
+//
+unique_lock<mutex> ug1(m1,defer_lock);
+unique_lock<mutex> ug2(m2,defer_lock);
+lock(ug1,ug2);
+
+//单例模式
+mutex m;
+sometype *g_instance = NULL;
+sometype* getInstance()
+{
+	if(g_instance == NULL)
+	{
+		lock_guard<mutex> lg(m);
+		if(g_instance == NULL)
+			g_instance = new sometype();
+	}
+	return g_instance;
+}
+//存在条件竞争，一个线程可能返回一个未初始化完成的指针。
+//方式1：利用call_once
+mutex m;
+once_flag resource_flag;
+sometype *g_instance = NULL;
+void init()
+{
+	if(g_instance == NULL)
+		g_instance = new sometype();
+
+}
+sometype* foo()
+{
+	call_once(resource_flag, init);
+	return g_instance;
+}
+
+lock_guard<boost::shared_mutex>
+unique_lock<boost::shared_mutex>
+boost::shared_lock<boost::shared_mutex>
+
+class dns_cache
+{
+private:
+	mutable boost::shared_mutex entry_mutex;
+	map<string, dns_entry> entries;
+public:
+	dsn_entry find_entry()
+	{
+		boost::shared_lock<boost::shared_mutex> sl(entry_mutex);//read-lock只读
+		//get entry;
+		return entry;
+	}
+	void update_entry(string const &domain, dns_entry const & dns_details)
+	{
+		lock_guard<boost::shared_mutex> lg(entry_mutex);//write-lock独占
+		//update
+
+	}
+};
+
+std::recursive_mutex;
+
+
+
+
+流媒体技术：
+原始数据->编码为串流格式的音频、视频数据->网络传输->用户播放器->解码播放
+
+流媒体业务类型：
+点播（VOD):将已有的多媒体数据编码压缩为对应的格式后，存放到媒体服务器上，同时将多媒体内容放到web portal上，用户通过web portal根据需要有选择的进行播放。
+直播(LIVE):将多媒体实时信号编码为对应的格式，
+
+流媒体协议：
+HTTP Progressive Download:	边下边播协议，VOD协议，播放器发送HTTP GET消息即可播放
+							只需一套HTTP server即可
+							特点：	边下边播
+									视频文件会下载并保存到临时目录
+									无法快进
+									下载一次再播放直接播放本地
+							缺点：看一段需要把全部视频下载，安全性差，只能用于点播，不能直播
+
+RTSP AND RTMP
+	客户端和服务器之间一直存在控制通道和数据通道，不缓存，TCP/UDP,
+
+
+//smart pointer
+//udp program
+//tcp program
+
+video codec:
+	H.263/H.264/H.265/VP8/VP9/
+	SVC/Hardware codec
+
+audio codec:
+	G.711/G.722/G.729/G.719
+	8khz  16khz 8khz  48khz
+	SILK(skype codec)
+	opus(webrtc)	
+
+
+capture 	AEC 				encoder 	rtp 	send
+		  60ms delay	rtp ts
+		  				rtcp ntp time  
+
+
+Windows Synchronization
+event/mutex/semaphore/criticalSection: if specify name, can be used to IPC.
+criticalSection can be used only by the threads of a single process.
+
+	mutex://for threads in one process or multiple processes
+		OpenMutex();//threads in other process by its name
+		DuplicateHandle()//unamed mutex
+		CreateMutex(heri, init-state, name);
+		WaitForSingleObject(mutex, time);
+		ReleaseMutex(mutex);
+
+	event://for threads in one process or multiple processes
+		OpenEvent();//threads in other process by its name
+		CreateEvent(heri, manual/auto, inti-state, name);
+		WaitForSingleObject(event,time);
+		SetEvent(event);
+		ResetEvent(event);
+		CloseHandle(event);
+
+	semaphore:
+		CreateSemaphore(attributes, init-count, max-count, name);//init-count>=0 && init-count <= max-count
+		WaitForSingleObject(semaphore);//sub
+		ReleaseSemaphore(semaphore);//add 
+		CloseHandle(semaphore);
+
+	Critical_Section://can be used by threads in one process
+		InitializeCriticalSection(*Critical_Section);
+		EnterCriticalSection(*Critical_Section);
+		LeaveCriticalSection(*Critical_Section);
+		TryEnterCriticalSection(*Critical_Section);
+		DeleteCriticalSection(*Critical_Section);	
+
+event:
+	manual-reset event
+		
+	auto-reset event:
+		if a single waiting thread is released, the system automatically sets the state to nonsignaled.
+
+
+
+
+//
+HANDLE mutex = CreateMutex(NULL, FALSE, NULL);
+WaitForSingleObject(mutex, INFINITE);
+ReleaseMutex(mutex);
+
+CloseHandle(threadId);
+
+
+
